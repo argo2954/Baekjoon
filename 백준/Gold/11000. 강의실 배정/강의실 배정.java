@@ -24,17 +24,17 @@ class Main {
         });
 
         // push a start time of first class to classes
-        classes.offer(Times[0][1]);
+        classes.add(Times[0][1]);
         // 1toN -> push finish time of class & compare
         for(int i=1; i<N; i++){
             int start = Times[i][0];
             int finish = Times[i][1];
             // when the start variable is bigger than the first time of classes
             if(classes.peek() <= start){
-                classes.poll();
+                classes.remove();
             }
             // create new class
-            classes.offer(finish);
+            classes.add(finish);
         }
 
         System.out.println(classes.size());
