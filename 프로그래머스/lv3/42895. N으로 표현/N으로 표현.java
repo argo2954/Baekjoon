@@ -9,7 +9,7 @@ class Solution {
             
         // init | numberOfTimes->LinkedList<Integer>[9]
         int consecutive = N; // make for (N, NN, NNN, ---, NNNNNNNN)
-        TreeSet<Integer>[] numberOfTimes = new TreeSet[9];
+        Set<Integer>[] numberOfTimes = new TreeSet[9];
         for(int i=1; i<=8; i++){
             numberOfTimes[i] = new TreeSet<>();
             numberOfTimes[i].add(consecutive); // fill (N, NN ....)
@@ -19,10 +19,10 @@ class Solution {
         // init | rest of numberOfTimes
         for(int i=2; i<=8; i++){
             for(int j=1; j<=i/2; j++){
-                TreeSet<Integer> left = numberOfTimes[j];
-                TreeSet<Integer> right = numberOfTimes[i-j];
+                Set<Integer> left = numberOfTimes[j];
+                Set<Integer> right = numberOfTimes[i-j];
                 
-                TreeSet<Integer> target = numberOfTimes[i];
+                Set<Integer> target = numberOfTimes[i];
                 for(int l: left){
                     for(int r: right){
                         int plus = l+r;
