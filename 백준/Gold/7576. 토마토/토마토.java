@@ -1,129 +1,111 @@
-import java.io.*;
-import java.util.LinkedList;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.StringTokenizer;
 
-class Main {
-    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-    static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-    static int n, m;
-    static int[][] storage;
-
-    // MAIN FUNCTION //
-    public static void main(String[] args) throws IOException {
-        input();
-        Graph g = new Graph(n, m);
-        g.setAdjacent();
-        System.out.println(g.find());
+public class Main {
+    public static void main(String[] args) throws Exception {
+        House house = new House();
+        house.input();
+        house.twoThousandYearLater();
+        house.answer();
     }
 
-    // INPUT FUNCTION //
-    static void input() throws IOException {
-        String[] input = br.readLine().split(" ");
-        m = Integer.parseInt(input[0]);
-        n = Integer.parseInt(input[1]);
-
-        storage = new int[n][m];
-        for (int i = 0; i < n; i++) {
-        String[] line = br.readLine().split(" ");
-        for (int j = 0; j < m; j++) {
-            storage[i][j] = Integer.parseInt(line[j]); 
-        }
-        }
-    }
-
-    // GRAPH //
-    static class Graph {
-        class Node {
+    static class House{
+        class Tomato implements Comparable<Tomato>{
             int day;
-            LinkedList<Node> adjacent;
+            int x;
+            int y;
 
-            Node(int day){
+            Tomato(int day, int y, int x){
                 this.day = day;
-                adjacent = new LinkedList<Node>();
-            } // Node initial
-        } // Node class
-
-        Node[][] nodes;
-        int n, m;
-        
-        Graph(int n, int m) {
-            this.n = n;
-            this.m = m;
-            nodes = new Node[n][m];
-            for (int y = 0; y < n; y++) {
-                for (int x = 0; x < m; x++) {
-                int day = (storage[y][x]==-1)? -1: n*m;
-                nodes[y][x] = new Node(day);
-                }
+                this.y = y;
+                this.x = x;
             }
-        } // Graph initial
 
-        void addEdge(int y1, int x1, int y2, int x2) {
-            if(y1<0 || x1<0 || y2<0 || x2<0) return;
-            if(y1==n || x1==m || y2==n || x2==m) return;
+            @Override
+            public int compareTo(Tomato o) {
+                return this.day - o.day;
+            }
+
             
-            Node n1 = nodes[y1][x1];
-            Node n2 = nodes[y2][x2];
+        }
 
-            if (n1.day!=-1 && n2.day!=-1){
-                n1.adjacent.add(n2);
-                n2.adjacent.add(n1);
-            }
-        } // Node to node setting
+        int N,M,answer;
+        Tomato[][] tomatos;
+        List<Tomato> ripenTomatos;
+        int[][] add = {{0,-1}, {-1,0}, {1,0}, {0,1}};
+        
+        House(){
+            ripenTomatos = new ArrayList<>();
+        }
 
-        void setAdjacent() { // connect between nodes
-            for(int y=0; y<n; y++){
-                for(int x=0; x<m; x++){
-                    if(storage[y][x] != -1){
-                        addEdge(y, x, y+1, x);
-                        addEdge(y, x, y-1, x);
-                        addEdge(y, x, y, x+1);
-                        addEdge(y, x, y, x-1);
-                    }
-                }
-            }
-        }// connect between nodes
+        void input()throws IOException{
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+            StringTokenizer stk = new StringTokenizer(br.readLine());
+             
+            M = Integer.parseInt(stk.nextToken());
+            N = Integer.parseInt(stk.nextToken());
+            tomatos = new Tomato[N+2][M+2];
 
-        void BFS() {
-            Queue<Node> queue = new LinkedList<Node>();
-            for (int i = 0; i < n; i++) {
-                for (int j = 0; j < m; j++) {
-                    if(storage[i][j]==1){
-                        Node root = nodes[i][j];
-                        queue.offer(root);
-                        root.day = 0;
-                    }
-                }
-            }
+            for(int i=1; i<=N; i++){
+                stk = new StringTokenizer(br.readLine());
+                for(int j=1; j<=M; j++){
+                    Tomato tomato = new Tomato(Integer.parseInt(stk.nextToken()), i, j);
+                    tomatos[i][j] = tomato;
 
-            while (!queue.isEmpty()) {
-                Node r = queue.peek();
-                int rday = r.day;
-                queue.remove();   
-                for (Node n : r.adjacent) {
-                    if (rday<n.day-1) {
-                        n.day = rday+1;
-                        queue.offer(n);
+                    if(tomato.day == 1){
+                        ripenTomatos.add(tomato);
                     }
                 }
             }
         }
 
-        int find(){
-        // bfs
-        BFS();
+        void twoThousandYearLater(){
+            Queue<Tomato> pq = new PriorityQueue<>();
+            ripenTomatos.forEach(t->pq.add(t));
 
-        // find answer
-        int answer = 0;
-            for (int i = 0; i < n; i++) {
-                for (int j = 0; j < m; j++) {
-                    if(nodes[i][j].day==n*m)
-                        return -1;
-                    if(nodes[i][j].day>answer)
-                        answer = nodes[i][j].day;
+            while(!pq.isEmpty()){
+                Tomato tomato = pq.poll();
+                int x = tomato.x;
+                int y = tomato.y;
+                int day = tomato.day;
+
+                for(int i=0; i<4; i++){
+                    Tomato nextTomato = tomatos[y+add[i][0]][x+add[i][1]];
+                    if(nextTomato==null)
+                        continue;
+
+                    if(nextTomato.day>day){
+                        nextTomato.day = day+1;
+                    }
+                    else if(nextTomato.day==0){
+                        nextTomato.day = day+1;
+                        pq.add(nextTomato);
+                    }
                 }
             }
-        return answer;
+        }
+    
+        void answer(){
+            for(int i=1; i<=N; i++){
+                for(int j=1; j<=M; j++){
+                    int day = tomatos[i][j].day;
+
+                    if(day==0){
+                        System.out.println(-1);
+                        return;
+                    }
+                    
+                    answer = Math.max(answer, day);
+                }
+            }
+
+            System.out.println(answer-1);
         }
     }
 }
