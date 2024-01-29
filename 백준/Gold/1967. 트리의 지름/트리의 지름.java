@@ -1,91 +1,116 @@
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Stack;
 import java.util.StringTokenizer;
 
-class Main {
-    public static void main(String[] args) throws IOException {
-        inputAndInit();
-        System.out.println(length[dfs(dfs(1))]);
+public class Main {
+    /**
+     * 10000개의 노드가 존재.
+     * 5000 -> 5000 이므로
+     * 5000개 시작을 체크하면 시간초과남
+     * 루트부터 시작해서 최장 거리 찾기 -> dfs
+     * 최장거리의 끝부터 다시 최장거리 찾기 -> dfs
+     */
+    public static void main(String[] args) throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        int size = Integer.parseInt(br.readLine());
+
+        Graph g = new Graph(size);
+
+        for(int i=1; i<size; i++){
+            StringTokenizer stk = new StringTokenizer(br.readLine());
+
+            int n1 = Integer.parseInt(stk.nextToken());
+            int n2 = Integer.parseInt(stk.nextToken());
+            int w = Integer.parseInt(stk.nextToken());
+
+            g.setAdjacent(n1, n2, w);
+        }
+
+        int startNodeNumber = g.dfs(1);
+        g.clear();
+        int endNodeNumber = g.dfs(startNodeNumber);
+        System.out.println(g.nodes[endNodeNumber].length);
     }
 
-    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-    static LinkedList<Integer>[] nodes;
-    static LinkedList<Integer>[] weights;
-    static int[] length;
-    static boolean[] marked;
-    static int N;
-    
-    
-    static void inputAndInit() throws IOException{
-        N = Integer.parseInt(br.readLine());
-        marked = new boolean[N+1];
-        length = new int[N+1];
+    static class Graph{
+        class Node{
+            int index;
+            int length;
+            boolean marked;
+            List<Node> adjacent;
+            List<Integer> weight;
 
-        nodes = new LinkedList[N+1];
-        weights = new LinkedList[N+1];
-        
-        for(int i=0; i<=N; i++){
-            nodes[i] = new LinkedList<>();
-            weights[i] = new LinkedList<>();
+            Node(int index){
+                this.index = index;
+                length = 0;
+                marked = false;
+                adjacent = new LinkedList<>();
+                weight = new LinkedList<>();
+            }
         }
-        
-        for(int i=1; i<N; i++){
-            String s = br.readLine();
-            StringTokenizer token = new StringTokenizer(s);
-            int p = Integer.parseInt(token.nextToken());    // parent
-            int c = Integer.parseInt(token.nextToken());    // child
-            int w = Integer.parseInt(token.nextToken());    // weight
-            
-            nodes[p].add(c);
-            nodes[c].add(p);
-            
-            weights[p].add(w);
-            weights[c].add(w);
+
+        int size;
+        Node[] nodes;
+        Graph(int size){
+            this.size = ++size;
+            nodes = new Node[size];
+            for(int i=0; i<size; i++){
+                nodes[i] = new Node(i);
+            }
         }
-    }
-    
-    static int dfs(int root){
-        clear();
 
-        Stack<Integer> stack = new Stack<>();
-        stack.push(root);
-        marked[root] = true;
+        void setAdjacent(int i1, int i2, int weight){
+            Node node1 = nodes[i1];
+            Node node2 = nodes[i2];
 
-        while(!stack.isEmpty()){
-            int index = stack.pop();
-            int len = nodes[index].size();
+            node1.adjacent.add(node2);
+            node1.weight.add(weight);
+            node2.adjacent.add(node1);
+            node2.weight.add(weight);
+        }
 
-            for(int i=0; i<len; i++){
-                int node = nodes[index].get(i);
-                if(!marked[node]){
-                    marked[node] = true;
-                    stack.push(node);
+        int dfs(int root){
+            Node rootNode = nodes[root];
+            rootNode.marked = true;
 
-                    length[node] += length[index] + weights[index].get(i);
+            Stack<Node> stack = new Stack<>();
+            stack.push(rootNode);
+
+            while(!stack.isEmpty()){
+                Node node = stack.pop();
+                int len = node.adjacent.size();
+
+                for(int i=0; i<len; i++){
+                    Node cNode = node.adjacent.get(i);
+
+                    if(!cNode.marked){
+                        cNode.marked = true;
+                        cNode.length += node.length + node.weight.get(i);
+                        stack.push(cNode);
+                    }
                 }
             }
-        }
 
-        int len = 0;
-        int index = 0;
-        for(int i=0; i<=N; i++){
-            if(len<length[i]){
-                len = length[i];
-                index = i;
+            int index = 0;
+            int maxLength = 0;
+            for(int i=1; i<size; i++){
+                if(maxLength < nodes[i].length){
+                    index = i;
+                    maxLength = nodes[i].length;
+                }
             }
+
+            return index;
         }
-        
-        return index;
-    }
 
-
-    static void clear(){
-        for(int i=0; i<=N; i++){
-            marked[i] = false;
-            length[i] = 0;
+        void clear(){
+            for(int i=1; i<size; i++){
+                nodes[i].length = 0;
+                nodes[i].marked = false;
+            }
         }
     }
 }
