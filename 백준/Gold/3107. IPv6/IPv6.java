@@ -1,15 +1,12 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.LinkedList;
-import java.util.List;
 
 public class Main {
 
-	static List<String> result = new LinkedList<>();
+	static StringBuilder result = new StringBuilder();
 	
 	public static void main(String[] args) throws IOException{
-		// TODO Auto-generated method stub
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		String[] input = br.readLine().split("::");
 
@@ -19,7 +16,7 @@ public class Main {
 			int sizeOfZero = 8-left.length-right.length;
 			
 			demux(left);
-			for(int i=0; i<sizeOfZero;i++) result.add("0000");
+			for(int i=0; i<sizeOfZero;i++) result.append("0000:");
 			demux(right);
 
 		} else if(input.length==1) {
@@ -28,11 +25,12 @@ public class Main {
 			
 			if(split.length<8) {
 				int sizeOfZero = 8 - split.length;
-				for(int i=0; i<sizeOfZero;i++) result.add("0000");
+				for(int i=0; i<sizeOfZero;i++) result.append("0000:");
 			}
 		}
 		
-		print();
+		result.deleteCharAt(result.length()-1);
+        System.out.println(result);
 	}
 	
 	static void demux(String[] strs) {
@@ -42,14 +40,7 @@ public class Main {
 			for(int i=0; i<zero; i++)
 				str = "0"+str;
 			
-			result.add(str);
+			result.append(str+":");
 		}
-	}
-
-	static void print() {
-		for(int i=0; i<7; i++) {
-			System.out.print(result.get(i)+":");
-		}
-		System.out.println(result.get(7));
 	}
 }
