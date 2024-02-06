@@ -57,7 +57,8 @@ public class Main {
     }
 
     static void fillAll(int cur){
-        int r = R;
+        // int r = R;
+        int r = R % (2 * ((N - 2 * cur - 1) + (M - 2 * cur - 1)));
 
         while(r-->0){
             queue.add(queue.poll());
