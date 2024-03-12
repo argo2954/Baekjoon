@@ -16,7 +16,12 @@ public class Main {
 
         // 확인
         int answer = Integer.MAX_VALUE;
-        int maxCountOfA = (int)(input.chars().filter(ch -> ch == 'a').count());
+        // int maxCountOfA = (int)(input.chars().filter(ch -> ch == 'a').count());
+        int maxCountOfA = 0;
+        for(int i=0; i<length; i++){
+            if(input.charAt(i) == 'a') maxCountOfA++;
+        }
+
         for(int i=maxCountOfA; i<=length*2; i++){
             int count = countA[i]-countA[i-maxCountOfA];
             answer = Math.min(answer, maxCountOfA-count);            
