@@ -13,37 +13,33 @@ public class Main {
         int N = Integer.parseInt(stk.nextToken());
         int M = Integer.parseInt(stk.nextToken());
 
-        // 입력| 0의 개수(열 기준)
-        String[] table = new String[N];
+        // 입력| lines, K
+        String[] lines = new String[N];
         for(int i=0; i<N; i++){
-            table[i] = br.readLine();
+            lines[i] = br.readLine();
         }
-
-        Map<Long, Integer> map = new HashMap<>();
         int K = Integer.parseInt(br.readLine());
-        for(int i=0; i<N; i++){
-            long indexes = 0;
+
+        // 각 라인의 0을 모두 뒤집을 수 있는지 판단하고, 가능한 경우 map에 저장
+        Map<Long, Integer> map = new HashMap<>();
+        int answer = 0;
+        for(String line: lines){
+            long shift = 0;
             int count = 0;
+
             for(int j=0; j<M; j++){
-                if(table[i].charAt(j)=='0'){
-                    indexes |= 1L<<j;
+                if(line.charAt(j)=='0'){
+                    shift |= 1L<<j;
                     count++;
                 }
             }
-            if(count > K) continue;
-            if((K-count)%2==1) continue;
-            if(map.containsKey(indexes)){
-                map.put(indexes, map.get(indexes)+1);
-            }else{
-                map.put(indexes, 1);
-            }
-        }
+            if(count > K || (K-count)%2==1) continue;
 
-        int answer = 0;
-        for(Long key: map.keySet()){
-            answer = Math.max(answer, map.get(key));
+            map.put(shift, map.getOrDefault(shift, 0)+1);
+            answer = Math.max(answer, map.get(shift));
         }
-
+        
+        // 출력
         System.out.println(answer);
     }
 }
