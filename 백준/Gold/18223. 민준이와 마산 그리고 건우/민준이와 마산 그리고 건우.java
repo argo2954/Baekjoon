@@ -11,6 +11,7 @@ public class Main {
 
     static int V,E,P;
     static List<Next>[] nodes;
+    static int[] visit;
 
     static class Next{
         int index;
@@ -48,19 +49,16 @@ public class Main {
         // 다익스트라| 1->V
         int one2v = dijkstra(1, V);
 
-        // 다익스트라| 1->P
-        int one2p = dijkstra(1, P);
-
         // 다익스트라| P->V
-        int p2v = dijkstra(P, V);
+        int one2p2v = visit[P] + dijkstra(P, V);
         
         // 출력
-        System.out.println((one2v < one2p+p2v)? "GOOD BYE": "SAVE HIM");
+        System.out.println((one2v < one2p2v)? "GOOD BYE": "SAVE HIM");
     }
 
     static int dijkstra(int start, int end){
         Queue<int[]> queue = new PriorityQueue<>((a1,a2)->a1[1]-a2[1]);
-        int[] visit = new int[V+1];
+        visit = new int[V+1];
         Arrays.fill(visit, Integer.MAX_VALUE);
 
         queue.add(new int[]{start, 0});
