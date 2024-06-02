@@ -35,7 +35,7 @@ public class Main {
         // 
         int first = 1;
         int second = 1;
-        int min = 200;
+        int min = Integer.MAX_VALUE;
         for(int i=1; i<=N; i++){
             for(int j=1; j<=N; j++){
                 if(i==j) continue;
