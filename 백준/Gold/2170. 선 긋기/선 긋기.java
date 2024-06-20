@@ -1,53 +1,42 @@
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.Arrays;
+import java.util.StringTokenizer;
 
-class Main {
-  public static void main(String[] args) throws IOException{
-    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-    
-    // input | N -> int
-    int N = Integer.parseInt(br.readLine());
+public class Main {
 
-    // input | X & Y -> priorityQueue<pair<int, int>>
-    PriorityQueue<Pair> pq = new PriorityQueue<Pair>((pq1, pq2)->{
-        return pq1.a!=pq2.a? pq1.a-pq2.a: pq1.b-pq2.b;
-    });
-    for(int i=0; i<N; i++){
-        String[] S = br.readLine().split(" ");
-        pq.add(new Pair(Integer.parseInt(S[0]), Integer.parseInt(S[1])));
-    }
+    static int N;
+    static int[][] lines;
 
-    // solve | 이전 선의 끝 지점을 기억해, 이번 선과 연결되는지 확인
-    int answer = 0;
-    int preEnd = Integer.MIN_VALUE;
-    
-    while(!pq.isEmpty()){
-        Pair pair = pq.poll();
-        int start = pair.a;
-        int end = pair.b;
+    public static void main(String[] args) throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        if(start<=preEnd){  // 선이 이어질 때
-            if(preEnd<end){
-                answer += end-preEnd;       
-                preEnd = end;
-            }
-        } else{ // 선이 이어지지 않을 때
-            answer += end-start;
-            preEnd = end;
+        N = Integer.parseInt(br.readLine());
+        lines = new int[N][2];
+
+        for(int i=0; i<N; i++){
+            StringTokenizer stk = new StringTokenizer(br.readLine());
+            lines[i][0] = Integer.parseInt(stk.nextToken());
+            lines[i][1] = Integer.parseInt(stk.nextToken());
         }
+
+        Arrays.sort(lines, (l1, l2) -> l1[0]!=l2[0]? l1[0]-l2[0]: l1[1]-l2[1]);
+
+        long sum = 0;
+        int s = lines[0][0];
+        int e = lines[0][1];
+        for(int[] line: lines){
+            if(line[0] <= e) // 라인 연결
+                e = Math.max(e, line[1]);
+            else{          // 라인 끊김  
+                sum += e-s;
+                s = line[0];
+                e = line[1];
+            }
+        }
+
+        sum += e-s;
+
+        System.out.println(sum);
     }
-
-    System.out.println(answer);
-  }
-
-  // class | 선의 정보 저장
-  static class Pair{
-    int a;
-    int b;
-
-    Pair(int a, int b){
-        this.a = a;
-        this.b = b;
-    }
-  }
 }
