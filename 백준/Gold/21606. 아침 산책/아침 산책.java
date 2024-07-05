@@ -9,7 +9,7 @@ public class Main {
     static List<Integer> in = new LinkedList<>();
     static List<Integer>[] adjacent;
     static boolean[] check;
-    static int answer = 0;
+    static long answer = 0;
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -43,41 +43,38 @@ public class Main {
     static void twoThousandYearsLater(){
         check = new boolean[N+1];
         for(int index: in){
-            if(check[index]) continue;
-            onsStepTwoStep(index);
+            // 하나의 실내로부터 나올 수 있는 조직의 수 만큼 반복
+            for(int adj: adjacent[index]){
+                if(A[adj] == 1) answer++;
+                else if(check[adj]) continue;
+                else onsStepTwoStep(index, adj);
+            }
         }
     }
 
-    static void onsStepTwoStep(int index){
-        Queue<int[]> queue = new ArrayDeque<>();
-        Map<Integer, Integer> map = new HashMap<>();
+    static void onsStepTwoStep(int index, int adj){
+        Queue<Integer> queue = new ArrayDeque<>();
 
-        queue.add(new int[]{index, index}); // next, root
-        map.put(index, 1);
-        check[index] = true;
+        long cnt = 1;
+        queue.add(adj);
+        check[adj] = true;
 
         while(!queue.isEmpty()){
-            int[] now = queue.poll();
+            int now = queue.poll();
 
-            for(int next: adjacent[now[0]]){
-                if(check[next]) continue;
+            for(int next: adjacent[now]){
+                if(check[next] || next==index) continue;
 
                 if(A[next] == 1){
-                    map.put(now[1], map.get(now[1])+1);
-                    map.put(next, 1);
-
-                    queue.add(new int[]{next, next});
-                    check[next] = true;
+                    cnt++;
                     continue;
                 }
 
-                queue.add(new int[]{next, now[1]});
+                queue.add(next);
                 check[next] = true;
             }
         }
 
-        for(int value: map.values()){
-            answer += value * (value-1);
-        }
+        answer += cnt * (cnt-1);
     }
 }
