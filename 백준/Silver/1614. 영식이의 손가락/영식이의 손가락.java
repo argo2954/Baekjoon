@@ -20,9 +20,8 @@ public class Main {
         count = Integer.parseInt(br.readLine());
 
         long answer = finger;
-        for(int i=0; i<count; i++){
-            answer += songarack[finger][i%2];
-        }
+        answer += songarack[finger][0] * (count/2l + (count%2==1? 1: 0));
+        answer += songarack[finger][1] * (count/2l);
 
         System.out.println(answer-1);
     }
